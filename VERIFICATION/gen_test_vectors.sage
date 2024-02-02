@@ -33,7 +33,9 @@ if __name__ == "__main__":
         filename = "sim_" + str(WIDTH) + "_" + str(N) + "_" + str(LAMBDA) + ".txt"
         
 
-    filename = os.path.abspath(os.path.dirname(__file__)) + "/TEST_VECTORS/TXT/" + filename
+    filename = os.path.abspath(os.path.dirname(__file__)) + "/TEST_VECTORS/" + filename
+
+    PolyRing = PolynomialRing(ZZ, x)
     
     with open(filename, "w") as test_file:
 
@@ -46,7 +48,7 @@ if __name__ == "__main__":
                 p = random_prime(2**WIDTH, False, 2**(WIDTH-1))
             
                 try:
-                    AMNS_inst = AMNS(p, N, LAMBDA = LAMBDA)
+                    AMNS_inst = PMNS(p, f"x**{N}-{LAMBDA}", phi_word_width=17)
                     valid = 1
                 except Exception as error:
                     valid = 0
@@ -63,20 +65,21 @@ if __name__ == "__main__":
             b_int = random.randrange(2**(WIDTH-1), p)
                     
             E = AMNS_inst.E
-            gamma = AMNS_inst.GAMMA
+            gamma = AMNS_inst.gamma
 
-            phi_log2 = AMNS_inst.phi_log2
+            phi_log2 = len(bin(AMNS_inst.phi)[2:])-1
+            print(phi_log2)
             phi = 2**phi_log2
 
             s = (phi_log2-1)//17+1
 
-            M = AMNS_inst.M
-            M_prime = AMNS_inst.M_P
+            M = AMNS_inst.M_poly
+            M_prime = AMNS_inst.M_prime_poly
 
             M_prime_0 = M_prime.map_coefficients(lambda t : t % W)
 
-            A = PolyRing(AMNS_inst.conv_in(a_int))
-            B = PolyRing(AMNS_inst.conv_in(b_int))
+            A = AMNS_inst(a_int, mgt=False)
+            B = AMNS_inst(b_int, mgt=False)
 
             A_comp2 = polcomp2(A, (s-1)*w+48)
             B_comp2 = polcomp2(B, (s-1)*w+48)

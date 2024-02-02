@@ -1,5 +1,6 @@
 load("PMNS.sage")
 import random
+PolyRing = PolynomialRing(ZZ, x)
 
 def polcomp2(A, width):
     if isinstance(A, PMNS_element):
@@ -51,9 +52,8 @@ def AMNS_FIOS(A_arr, B_arr, E, M_arr, M_prime_0):
     
     return res_arr
 
-if __name__ == "__main__":
-#def test(p_size):
-    p_size = 4096
+#if __name__=="__main__":
+def test(p_size):
     PolyRing = PolynomialRing(ZZ, name = "x", sparse = False)
 
     p = random_prime(2**p_size-1, False, 2**(p_size-1))
@@ -109,7 +109,3 @@ if __name__ == "__main__":
     
     print("\ntest  : ", hex(res(gamma) % p), "\nverif : ", hex(verif), "\nmatch : ", res(gamma) % p == verif)
 
-
-#if __name__ == "__main__":
-#    PolyRing = PolynomialRing(ZZ, x)
-#    test(256)
