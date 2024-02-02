@@ -29,6 +29,9 @@ class PMNS_element(
     def conv_out(self):
         return self.parent().conv_out(self)
 
+    def _integer_(self, Z=None):
+        return self.parent().conv_out(self)
+
 
 class PMNS(
     sage.rings.polynomial.polynomial_quotient_ring.PolynomialQuotientRing_domain,
