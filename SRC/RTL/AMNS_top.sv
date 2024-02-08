@@ -4,6 +4,8 @@
 module AMNS_top #(parameter  s = 4,
                              N = 5,
                              LAMBDA = 2,
+                 // WORD_WIDTH up to 32 bits
+                 WORD_WIDTH = 17,
              localparam int   PE_DELAY = 6,
                         int   PE_NB = (2*s+2+1)/PE_DELAY+1) (
                         
@@ -12,9 +14,9 @@ module AMNS_top #(parameter  s = 4,
         input start_i,
         
         
-        input [16:0] BRAM_dout_i, // Data Out Bus (optional)
+        input [WORD_WIDTH-1:0] BRAM_dout_i, // Data Out Bus (optional)
 
-        output [16:0] BRAM_din_o, // Data In Bus (optional)
+        output [WORD_WIDTH-1:0] BRAM_din_o, // Data In Bus (optional)
     
         output BRAM_we_o, // Byte Enables (optional)
     
@@ -37,9 +39,9 @@ module AMNS_top #(parameter  s = 4,
     
     wire [$clog2(4*N*s)-1:0] BRAM_addr;
     
-    wire [16:0] RES;
+    wire [WORD_WIDTH-1:0] RES;
 
-    reg [16:0] BRAM_dout_reg;
+    reg [WORD_WIDTH-1:0] BRAM_dout_reg;
     
     always @ (posedge clock_i)
         BRAM_dout_reg <= BRAM_dout_i;
@@ -53,33 +55,33 @@ module AMNS_top #(parameter  s = 4,
     reg M_prime_0_reg_en;
     wire M_prime_0_rot;
     
-    reg [N*17-1:0] M_prime_0_reg;
+    reg [N*WORD_WIDTH-1:0] M_prime_0_reg;
     
     always @ (posedge clock_i) begin
         
         if (reset_i)
             M_prime_0_reg <= 0;
         else if (M_prime_0_reg_en)
-            M_prime_0_reg <= {BRAM_dout_reg, M_prime_0_reg[N*17-1:17]};
+            M_prime_0_reg <= {BRAM_dout_reg, M_prime_0_reg[N*WORD_WIDTH-1:WORD_WIDTH]};
         else if (M_prime_0_rot)
-            M_prime_0_reg <= {M_prime_0_reg[16:0], M_prime_0_reg[N*17-1:17]};
+            M_prime_0_reg <= {M_prime_0_reg[WORD_WIDTH-1:0], M_prime_0_reg[N*WORD_WIDTH-1:WORD_WIDTH]};
         else
             M_prime_0_reg <= M_prime_0_reg;
     
     end
     
     reg M_reg_en;
-    reg [N*s*17-1:0] M_reg;
+    reg [N*s*WORD_WIDTH-1:0] M_reg;
 
     wire M_shift;
         
     reg A_reg_en;
-    reg [N*s*17-1:0] A_reg;
+    reg [N*s*WORD_WIDTH-1:0] A_reg;
     
     wire A_rot [0:s-1];
     
     reg B_reg_en;
-    reg [N*s*17-1:0] B_reg;
+    reg [N*s*WORD_WIDTH-1:0] B_reg;
     
     wire B_shift;
     
@@ -91,13 +93,13 @@ module AMNS_top #(parameter  s = 4,
             always @ (posedge clock_i) begin
             
                 if (reset_i)
-                    A_reg[(i+1)*N*17-1:i*N*17] <= 0;
+                    A_reg[(i+1)*N*WORD_WIDTH-1:i*N*WORD_WIDTH] <= 0;
                 else if (A_reg_en)
-                    A_reg[(i+1)*N*17-1:i*N*17] <= {(i == s-1) ? BRAM_dout_reg : A_reg[((i+1)*N+1)*17:(i+1)*N*17], A_reg[(i+1)*N*17-1:(i*N+1)*17]};
+                    A_reg[(i+1)*N*WORD_WIDTH-1:i*N*WORD_WIDTH] <= {(i == s-1) ? BRAM_dout_reg : A_reg[((i+1)*N+1)*WORD_WIDTH:(i+1)*N*WORD_WIDTH], A_reg[(i+1)*N*WORD_WIDTH-1:(i*N+1)*WORD_WIDTH]};
                 else if (A_rot[i])
-                    A_reg[(i+1)*N*17-1:i*N*17] <= {A_reg[(i*N+1)*17-1:i*N*17], A_reg[(i+1)*N*17-1:(i*N+1)*17]};
+                    A_reg[(i+1)*N*WORD_WIDTH-1:i*N*WORD_WIDTH] <= {A_reg[(i*N+1)*WORD_WIDTH-1:i*N*WORD_WIDTH], A_reg[(i+1)*N*WORD_WIDTH-1:(i*N+1)*WORD_WIDTH]};
                 else
-                    A_reg[(i+1)*N*17-1:i*N*17] <= A_reg[(i+1)*N*17-1:i*N*17];
+                    A_reg[(i+1)*N*WORD_WIDTH-1:i*N*WORD_WIDTH] <= A_reg[(i+1)*N*WORD_WIDTH-1:i*N*WORD_WIDTH];
             
             end
             
@@ -122,7 +124,7 @@ module AMNS_top #(parameter  s = 4,
         if (reset_i)
             M_reg <= 0;
         else if (M_reg_en || M_shift)
-            M_reg <= {BRAM_dout_reg, M_reg[N*s*17-1:17]};
+            M_reg <= {BRAM_dout_reg, M_reg[N*s*WORD_WIDTH-1:WORD_WIDTH]};
         else
             M_reg <= M_reg;
     end
@@ -132,7 +134,7 @@ module AMNS_top #(parameter  s = 4,
         if (reset_i)
             B_reg <= 0;
         else if (B_reg_en || B_shift)
-            B_reg <= {BRAM_dout_reg, B_reg[N*s*17-1:17]};
+            B_reg <= {BRAM_dout_reg, B_reg[N*s*WORD_WIDTH-1:WORD_WIDTH]};
         else
             B_reg <= B_reg;
     
@@ -142,14 +144,14 @@ module AMNS_top #(parameter  s = 4,
     // once result sections are provided. Result sections
     // are then loaded by the top_control FSM into the bridge BRAM.
 
-    reg [N*s*17-1:0] RES_reg;
+    reg [N*s*WORD_WIDTH-1:0] RES_reg;
 
     always @ (posedge clock_i) begin
     
         if (reset_i)
             RES_reg <= 0;
         else if (BRAM_we_o || RES_push)
-            RES_reg <= {RES, RES_reg[N*s*17-1:17]};
+            RES_reg <= {RES, RES_reg[N*s*WORD_WIDTH-1:WORD_WIDTH]};
         else
             RES_reg <= RES_reg;
     
@@ -193,19 +195,19 @@ module AMNS_top #(parameter  s = 4,
     
     end
 
-    reg [N*17-1:0] B_input;
+    reg [N*WORD_WIDTH-1:0] B_input;
     
     always_comb begin
         for (int j = 0; j < N; j++) begin
-            B_input[j*17+:17] = B_reg[s*j*17+:17];
+            B_input[j*WORD_WIDTH+:WORD_WIDTH] = B_reg[s*j*WORD_WIDTH+:WORD_WIDTH];
         end
     end
     
-    reg [s*17-1:0] A_input;
+    reg [s*WORD_WIDTH-1:0] A_input;
     
     always_comb begin
         for (int j = 0; j < s; j++) begin
-            A_input[j*17+:17] = A_reg[N*j*17+:17];
+            A_input[j*WORD_WIDTH+:WORD_WIDTH] = A_reg[N*j*WORD_WIDTH+:WORD_WIDTH];
         end
     end
     
