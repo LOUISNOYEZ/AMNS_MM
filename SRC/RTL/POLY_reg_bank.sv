@@ -22,11 +22,11 @@ module POLY_reg_bank #(
     input  [S-1:0] A_reg_coeff_rot_i, // Assertion of bit i triggers WORD_WIDTH bits rotation of coefficient i of A_reg data
     input  B_reg_shift_i,             // Triggers WORD_WIDTH bits shift of B_reg data
     input  M_reg_shift_i,             // Triggers WORD_WIDTH bits shift of A_reg data
-    input  M_prime_0_rot_i,       // Triggers rotation of one coefficient (of width WORD_WIDTH) of M_prime_0_reg data
+    input  M_prime_0_rot_i,           // Triggers rotation of one coefficient (of width WORD_WIDTH) of M_prime_0_reg data
     input  RES_reg_shift_i,           // Triggers WORD_WIDTH bits shift of RES_reg data for storing purpose
-    
-    input  [WORD_WIDTH-1:0]   INPUT_reg_din_i, // Input data signals for polynomial registers A, B, M, M_prime_0
-    input  [N*WORD_WIDTH-1:0] RES_reg_din_i,   // Input data signal for polynomial result register
+
+    input  [WORD_WIDTH-1:0] INPUT_reg_din_i, // Input data signals for polynomial registers A, B, M, M_prime_0
+    input  [WORD_WIDTH-1:0] RES_reg_din_i,   // Input data signal for polynomial result register
 
     output reg [S*WORD_WIDTH-1:0] A_reg_dout_o,
     output reg [N*WORD_WIDTH-1:0] B_reg_dout_o,

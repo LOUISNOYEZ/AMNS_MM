@@ -2,19 +2,17 @@
 
 
 module POLY_reg_bank_tb #(
-    WORD_WIDTH = 17,
-    N = 5,
-    S = 4
+    WORD_WIDTH  = 17, // Width of words used in DSP block operations. Upper limit depends on DSP block architecture
+    N           =  5, // Number of coefficients in an AMNS polynomial
+    S           =  4  // Number of blocks of width WORD_WIDTH required to hold a coefficient
 ) ();
 
     localparam realtime PERIOD = 10,
                         HALF_PERIOD = PERIOD/2;
 
     localparam NB_TESTS = 10;
-    reg [$clog2(NB_TESTS)-1:0] test_count = 0;
-    reg [$clog2(NB_TESTS)-1:0] successful_test_count = 0;
-    reg test = 1;
-
+    reg [$clog2(NB_TESTS):0] test_count = 0;
+    reg [$clog2(NB_TESTS):0] successful_test_count = 0;
     reg test = 1;
 
     reg clock = 0;
