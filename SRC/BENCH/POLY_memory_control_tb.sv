@@ -39,7 +39,7 @@ module POLY_memory_control_tb #(
     wire [1:0] INPUT_reg_sel;
     wire INPUT_reg_en;
 
-    wire RES_reg_shift;
+    wire store_RES_reg_en;
 
     wire load_done;
     wire store_done;
@@ -65,7 +65,7 @@ module POLY_memory_control_tb #(
     .INPUT_reg_sel_o(INPUT_reg_sel),
     .INPUT_reg_en_o(INPUT_reg_en),
 
-    .RES_reg_shift_o(RES_reg_shift),
+    .store_RES_reg_en_o(store_RES_reg_en),
 
     .load_done_o(load_done),
     .store_done_o(store_done)
@@ -85,7 +85,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(0) ||
             INPUT_reg_sel != 2'b00        ||
             INPUT_reg_en  != 1'b0         ||
-            RES_reg_shift != 1'b0         ||
+            store_RES_reg_en != 1'b0      ||
             load_done     != 1'b0         ||
             store_done    != 1'b0         ||
             POLY_memory_control_inst.current_state != RESET)
@@ -105,7 +105,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(0) ||
             INPUT_reg_sel != 2'b00        ||
             INPUT_reg_en  != 1'b0         ||
-            RES_reg_shift != 1'b0         ||
+            store_RES_reg_en != 1'b0      ||
             load_done     != 1'b0         ||
             store_done    != 1'b0         ||
             POLY_memory_control_inst.current_state != IDLE)
@@ -127,7 +127,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(0) ||
             INPUT_reg_sel != 2'b00        ||
             INPUT_reg_en  != 1'b0         ||
-            RES_reg_shift != 1'b0         ||
+            store_RES_reg_en != 1'b0      ||
             load_done     != 1'b0         ||
             store_done    != 1'b0         ||
             POLY_memory_control_inst.current_state != LOAD_A)
@@ -137,7 +137,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(1) ||
             INPUT_reg_sel != 2'b00        ||
             INPUT_reg_en  != 1'b0         ||
-            RES_reg_shift != 1'b0         ||
+            store_RES_reg_en != 1'b0      ||
             load_done     != 1'b0         ||
             store_done    != 1'b0         ||
             POLY_memory_control_inst.current_state != LOAD_A)
@@ -148,7 +148,7 @@ module POLY_memory_control_tb #(
                 BRAM_addr     != ADDR_LEN'(i) ||
                 INPUT_reg_sel != 2'b00        ||
                 INPUT_reg_en  != 1'b1         ||
-                RES_reg_shift != 1'b0         ||
+                store_RES_reg_en != 1'b0      ||
                 load_done     != 1'b0         ||
                 store_done    != 1'b0         ||
                 POLY_memory_control_inst.current_state != LOAD_A)
@@ -168,7 +168,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(N*S) ||
             INPUT_reg_sel != 2'b00          ||
             INPUT_reg_en  != 1'b1           ||
-            RES_reg_shift != 1'b0           ||
+            store_RES_reg_en != 1'b0        ||
             load_done     != 1'b0           ||
             store_done    != 1'b0           ||
             POLY_memory_control_inst.current_state != LOAD_B)
@@ -178,7 +178,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(N*S+1) ||
             INPUT_reg_sel != 2'b00            ||
             INPUT_reg_en  != 1'b1             ||
-            RES_reg_shift != 1'b0             ||
+            store_RES_reg_en != 1'b0          ||
             load_done     != 1'b0             ||
             store_done    != 1'b0             ||
             POLY_memory_control_inst.current_state != LOAD_B)
@@ -189,7 +189,7 @@ module POLY_memory_control_tb #(
                 BRAM_addr     != ADDR_LEN'(i) ||
                 INPUT_reg_sel != 2'b01        ||
                 INPUT_reg_en  != 1'b1         ||
-                RES_reg_shift != 1'b0         ||
+                store_RES_reg_en != 1'b0      ||
                 load_done     != 1'b0         ||
                 store_done    != 1'b0         ||
                 POLY_memory_control_inst.current_state != LOAD_B)
@@ -209,7 +209,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(2*N*S) ||
             INPUT_reg_sel != 2'b01            ||
             INPUT_reg_en  != 1'b1             ||
-            RES_reg_shift != 1'b0             ||
+            store_RES_reg_en != 1'b0          ||
             load_done     != 1'b0             ||
             store_done    != 1'b0             ||
             POLY_memory_control_inst.current_state != LOAD_M)
@@ -219,7 +219,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(2*N*S+1) ||
             INPUT_reg_sel != 2'b01              ||
             INPUT_reg_en  != 1'b1               ||
-            RES_reg_shift != 1'b0               ||
+            store_RES_reg_en != 1'b0            ||
             load_done     != 1'b0               ||
             store_done    != 1'b0               ||
             POLY_memory_control_inst.current_state != LOAD_M)
@@ -230,7 +230,7 @@ module POLY_memory_control_tb #(
                 BRAM_addr     != ADDR_LEN'(i) ||
                 INPUT_reg_sel != 2'b10        ||
                 INPUT_reg_en  != 1'b1         ||
-                RES_reg_shift != 1'b0         ||
+                store_RES_reg_en != 1'b0      ||
                 load_done     != 1'b0         ||
                 store_done    != 1'b0         ||
                 POLY_memory_control_inst.current_state != LOAD_M)
@@ -250,7 +250,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(3*N*S) ||
             INPUT_reg_sel != 2'b10            ||
             INPUT_reg_en  != 1'b1             ||
-            RES_reg_shift != 1'b0             ||
+            store_RES_reg_en != 1'b0          ||
             load_done     != 1'b0             ||
             store_done    != 1'b0             ||
             POLY_memory_control_inst.current_state != LOAD_M_PRIME_0)
@@ -260,7 +260,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(3*N*S+1) ||
             INPUT_reg_sel != 2'b10              ||
             INPUT_reg_en  != 1'b1               ||
-            RES_reg_shift != 1'b0               ||
+            store_RES_reg_en != 1'b0            ||
             load_done     != 1'b0               ||
             store_done    != 1'b0               ||
             POLY_memory_control_inst.current_state != LOAD_M_PRIME_0)
@@ -271,7 +271,7 @@ module POLY_memory_control_tb #(
                 BRAM_addr     != ADDR_LEN'(i) ||
                 INPUT_reg_sel != 2'b11        ||
                 INPUT_reg_en  != 1'b1         ||
-                RES_reg_shift != 1'b0         ||
+                store_RES_reg_en != 1'b0      ||
                 load_done     != 1'b0         ||
                 store_done    != 1'b0         ||
                 POLY_memory_control_inst.current_state != LOAD_M_PRIME_0)
@@ -290,7 +290,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(3*N*S+N) ||
             INPUT_reg_sel != 2'b11              ||
             INPUT_reg_en  != 1'b1               ||
-            RES_reg_shift != 1'b0               ||
+            store_RES_reg_en != 1'b0            ||
             load_done     != 1'b0               ||
             store_done    != 1'b0               ||
             POLY_memory_control_inst.current_state != LOAD_DONE)
@@ -300,7 +300,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(0)       ||
             INPUT_reg_sel != 2'b11              ||
             INPUT_reg_en  != 1'b1               ||
-            RES_reg_shift != 1'b0               ||
+            store_RES_reg_en != 1'b0            ||
             load_done     != 1'b0               ||
             store_done    != 1'b0               ||
             POLY_memory_control_inst.current_state != IDLE)
@@ -310,7 +310,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(0) ||
             INPUT_reg_sel != 2'b00        ||
             INPUT_reg_en  != 1'b0         ||
-            RES_reg_shift != 1'b0         ||
+            store_RES_reg_en != 1'b0      ||
             load_done     != 1'b1         ||
             store_done    != 1'b0         ||
             POLY_memory_control_inst.current_state != IDLE)
@@ -332,7 +332,7 @@ module POLY_memory_control_tb #(
                 BRAM_addr     != ADDR_LEN'(i) ||
                 INPUT_reg_sel != 2'b00        ||
                 INPUT_reg_en  != 1'b0         ||
-                RES_reg_shift != 1'b1         ||
+                store_RES_reg_en != 1'b1      ||
                 load_done     != 1'b0         ||
                 store_done    != 1'b0         ||
                 POLY_memory_control_inst.current_state != STORE_RES)
@@ -352,7 +352,7 @@ module POLY_memory_control_tb #(
             BRAM_addr     != ADDR_LEN'(4*N*S+N) ||
             INPUT_reg_sel != 2'b00              ||
             INPUT_reg_en  != 1'b0               ||
-            RES_reg_shift != 1'b0               ||
+            store_RES_reg_en != 1'b0            ||
             load_done     != 1'b0               ||
             store_done    != 1'b1               ||
             POLY_memory_control_inst.current_state != STORE_DONE)
@@ -366,7 +366,7 @@ module POLY_memory_control_tb #(
         $write("(test %0d/%0d) STORE_DONE state\n", test_count, NB_TESTS);
         #PERIOD;
         $write("(%0d/%0d) tests completed\n", successful_test_count, NB_TESTS);
-        if (test_count == NB_TESTS)
+        if (successful_test_count == NB_TESTS)
             $write("SUCCESS\n");
         else
             $write("FAILURE\n");

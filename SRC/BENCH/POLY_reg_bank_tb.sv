@@ -24,7 +24,7 @@ module POLY_reg_bank_tb #(
     reg [N*WORD_WIDTH-1:0]   M_prime_0_reg = 0;
     reg [N*S*WORD_WIDTH-1:0] expected_RES_reg = 0;
 
-    reg store_RES_reg_en = 0;
+    reg mem_RES_reg_en = 0;
     reg [N*S*WORD_WIDTH-1:0] store_RES_reg = 0;
 
 
@@ -34,7 +34,7 @@ module POLY_reg_bank_tb #(
     always @(posedge clock) begin
         if (reset)
             store_RES_reg <= 0;
-        else if (store_RES_reg_en)
+        else if (mem_RES_reg_en)
             store_RES_reg <= {RES_reg_dout, store_RES_reg[N*S*WORD_WIDTH-1:WORD_WIDTH]};
         else
             store_RES_reg <= store_RES_reg;
@@ -44,13 +44,13 @@ module POLY_reg_bank_tb #(
     reg [1:0] INPUT_reg_sel = 0;
     reg INPUT_reg_en = 0;
 
-    reg RES_reg_en = 0;
+    reg load_RES_reg_en = 0;
+    reg store_RES_reg_en = 0;
 
     reg [S-1:0] A_reg_coeff_rot = 0;
     reg B_reg_shift             = 0;
     reg M_reg_shift             = 0;
     reg M_prime_0_reg_rot       = 0;
-    reg RES_reg_shift           = 0;
 
     reg [WORD_WIDTH-1:0]   INPUT_reg_din = 0;
     reg [N*WORD_WIDTH-1:0] RES_reg_din   = 0;
@@ -74,14 +74,14 @@ module POLY_reg_bank_tb #(
         .INPUT_reg_sel_i(INPUT_reg_sel),
         .INPUT_reg_en_i(INPUT_reg_en),
 
-        .RES_reg_en_i(RES_reg_en),
+        .load_RES_reg_en_i(load_RES_reg_en),
+        .store_RES_reg_en_i(store_RES_reg_en),
 
         .A_reg_coeff_rot_i(A_reg_coeff_rot),
         .B_reg_shift_i(B_reg_shift),
         .M_reg_shift_i(M_reg_shift),
         .M_prime_0_rot_i(M_prime_0_reg_rot),
-        .RES_reg_shift_i(RES_reg_shift),
-        
+
         .INPUT_reg_din_i(INPUT_reg_din),
         .RES_reg_din_i(RES_reg_din),
 
@@ -278,12 +278,13 @@ module POLY_reg_bank_tb #(
         #PERIOD;
         std::randomize(expected_RES_reg);
         // Load result test
-        RES_reg_en = 1;
-        for (int k = 0; k < N*S; k++) begin
-            RES_reg_din = expected_RES_reg[k*WORD_WIDTH+:WORD_WIDTH];
+        load_RES_reg_en = 1;
+        for (int j = 0; j < S; j++) begin
+            for (int i = 0; i < N; i++)
+                RES_reg_din[i*WORD_WIDTH+:WORD_WIDTH] = expected_RES_reg[(i*S+j)*WORD_WIDTH+:WORD_WIDTH];
             #PERIOD;
         end
-        RES_reg_en = 0;
+        load_RES_reg_en = 0;
         RES_reg_din = 0;
         test_count = test_count+1;
         if (POLY_reg_bank_inst.RES_reg == expected_RES_reg) begin
@@ -294,10 +295,9 @@ module POLY_reg_bank_tb #(
         $write("(test %0d/%0d) Load RES_reg data\n", test_count, NB_TESTS);
         #PERIOD;
         // Store result test
+        mem_RES_reg_en = 1;
         store_RES_reg_en = 1;
-        RES_reg_shift = 1;
         #(N*S*PERIOD);
-        store_RES_reg_en = 0;
         test_count = test_count+1;
         if (store_RES_reg == expected_RES_reg) begin
             successful_test_count = successful_test_count+1;
@@ -305,11 +305,11 @@ module POLY_reg_bank_tb #(
         end else
             $write("FAILURE ");
         $write("(test %0d/%0d) Store RES_reg data\n", test_count, NB_TESTS);
+        mem_RES_reg_en = 0;
         store_RES_reg_en = 0;
-        RES_reg_shift = 0;
         #PERIOD;
         $write("(%0d/%0d) tests completed\n", successful_test_count, NB_TESTS);
-        if (test_count == NB_TESTS)
+        if (successful_test_count == NB_TESTS)
             $write("SUCCESS\n");
         else
             $write("FAILURE\n");

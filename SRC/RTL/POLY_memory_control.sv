@@ -18,7 +18,7 @@ module POLY_memory_control #(
     output [1:0] INPUT_reg_sel_o,
     output INPUT_reg_en_o,
 
-    output reg RES_reg_shift_o,
+    output reg store_RES_reg_en_o,
 
     output load_done_o,
     output reg store_done_o
@@ -93,7 +93,7 @@ module POLY_memory_control #(
                 BRAM_addr_counter_en = 0;
                 INPUT_reg_sel = 0;
                 INPUT_reg_en = 0;
-                RES_reg_shift_o = 0;
+                store_RES_reg_en_o = 0;
                 load_done = 0;
                 store_done_o = 0;
             end
@@ -103,7 +103,7 @@ module POLY_memory_control #(
                 BRAM_addr_counter_en = 0;
                 INPUT_reg_sel = 0;
                 INPUT_reg_en = 0;
-                RES_reg_shift_o = 0;
+                store_RES_reg_en_o = 0;
                 load_done = 0;
                 store_done_o = 0;
             end
@@ -113,7 +113,7 @@ module POLY_memory_control #(
                 BRAM_addr_counter_en = 1;
                 INPUT_reg_sel = 0;
                 INPUT_reg_en = 1;
-                RES_reg_shift_o = 0;
+                store_RES_reg_en_o = 0;
                 load_done = 0;
                 store_done_o = 0;
             end
@@ -123,7 +123,7 @@ module POLY_memory_control #(
                 BRAM_addr_counter_en = 1;
                 INPUT_reg_sel = 1;
                 INPUT_reg_en = 1;
-                RES_reg_shift_o = 0;
+                store_RES_reg_en_o = 0;
                 load_done = 0;
                 store_done_o = 0;
             end
@@ -133,7 +133,7 @@ module POLY_memory_control #(
                 BRAM_addr_counter_en = 1;
                 INPUT_reg_sel = 2;
                 INPUT_reg_en = 1;
-                RES_reg_shift_o = 0;
+                store_RES_reg_en_o = 0;
                 load_done = 0;
                 store_done_o = 0;
             end
@@ -143,7 +143,7 @@ module POLY_memory_control #(
                 BRAM_addr_counter_en = 1;
                 INPUT_reg_sel = 3;
                 INPUT_reg_en = 1;
-                RES_reg_shift_o = 0;
+                store_RES_reg_en_o = 0;
                 load_done = 0;
                 store_done_o = 0;
             end
@@ -153,7 +153,7 @@ module POLY_memory_control #(
                 BRAM_addr_counter_en = 0;
                 INPUT_reg_sel = 0;
                 INPUT_reg_en = 0;
-                RES_reg_shift_o = 0;
+                store_RES_reg_en_o = 0;
                 load_done = 1;
                 store_done_o = 0;
             end
@@ -163,7 +163,7 @@ module POLY_memory_control #(
                 BRAM_addr_counter_en = 1;
                 INPUT_reg_sel = 0;
                 INPUT_reg_en = 0;
-                RES_reg_shift_o = 1;
+                store_RES_reg_en_o = 1;
                 load_done = 0;
                 store_done_o = 0;
             end
@@ -173,7 +173,7 @@ module POLY_memory_control #(
                 BRAM_addr_counter_en = 0;
                 INPUT_reg_sel = 0;
                 INPUT_reg_en = 0;
-                RES_reg_shift_o = 0;
+                store_RES_reg_en_o = 0;
                 load_done = 0;
                 store_done_o = 1;
             end
@@ -183,7 +183,7 @@ module POLY_memory_control #(
                 BRAM_addr_counter_en = 0;
                 INPUT_reg_sel = 0;
                 INPUT_reg_en = 0;
-                RES_reg_shift_o = 0;
+                store_RES_reg_en_o = 0;
                 load_done = 0;
                 store_done_o = 0;
             end

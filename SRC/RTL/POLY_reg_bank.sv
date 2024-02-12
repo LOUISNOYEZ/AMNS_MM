@@ -17,16 +17,16 @@ module POLY_reg_bank #(
 
     // Data registers write enable signals
     // Trigger loading of WORD_WIDTH data bits in register and shift of currently available data
-    input  RES_reg_en_i,
+    input  load_RES_reg_en_i,
+    input  store_RES_reg_en_i,
 
     input  [S-1:0] A_reg_coeff_rot_i, // Assertion of bit i triggers WORD_WIDTH bits rotation of coefficient i of A_reg data
     input  B_reg_shift_i,             // Triggers WORD_WIDTH bits shift of B_reg data
     input  M_reg_shift_i,             // Triggers WORD_WIDTH bits shift of A_reg data
     input  M_prime_0_rot_i,           // Triggers rotation of one coefficient (of width WORD_WIDTH) of M_prime_0_reg data
-    input  RES_reg_shift_i,           // Triggers WORD_WIDTH bits shift of RES_reg data for storing purpose
 
     input  [WORD_WIDTH-1:0] INPUT_reg_din_i, // Input data signals for polynomial registers A, B, M, M_prime_0
-    input  [WORD_WIDTH-1:0] RES_reg_din_i,   // Input data signal for polynomial result register
+    input  [N*WORD_WIDTH-1:0] RES_reg_din_i,   // Input data signal for polynomial result register
 
     output reg [S*WORD_WIDTH-1:0] A_reg_dout_o,
     output reg [N*WORD_WIDTH-1:0] B_reg_dout_o,
@@ -137,13 +137,29 @@ module POLY_reg_bank #(
     // RES_reg data register
     reg [N*S*WORD_WIDTH-1:0] RES_reg;
 
-    always @(posedge clock_i) begin
+    genvar i;
+    generate
+        for (i = 0; i < N; i++) begin
+            always_ff @(posedge clock_i) begin
 
-        if (reset_i) RES_reg <= 0;
-        else if (RES_reg_en_i || RES_reg_shift_i) RES_reg <= {RES_reg_din_i, RES_reg[N*S*WORD_WIDTH-1:WORD_WIDTH]};
-        else RES_reg <= RES_reg;
+                if (reset_i) RES_reg[(i+1)*S*WORD_WIDTH-1:i*S*WORD_WIDTH] <= 0;
+                else if (load_RES_reg_en_i) begin
+                    RES_reg[(i+1)*S*WORD_WIDTH-1:i*S*WORD_WIDTH] <= {
+                        RES_reg_din_i[(i+1)*WORD_WIDTH-1:i*WORD_WIDTH],
+                        RES_reg[(i+1)*S*WORD_WIDTH-1:(i*S+1)*WORD_WIDTH]
+                    };
+                end
+                else if (store_RES_reg_en_i) begin
+                    RES_reg[(i+1)*S*WORD_WIDTH-1:i*S*WORD_WIDTH] <= {
+                        (i == N-1) ? WORD_WIDTH'(0) : RES_reg[((i+1)*S+1)*WORD_WIDTH-1:(i+1)*S*WORD_WIDTH],
+                        RES_reg[(i+1)*S*WORD_WIDTH-1:(i*S+1)*WORD_WIDTH]
+                    };
+                end
+                else RES_reg <= RES_reg;
 
-    end
+            end
+        end
+    endgenerate
 
     assign RES_reg_dout_o = RES_reg[WORD_WIDTH-1:0];
 
