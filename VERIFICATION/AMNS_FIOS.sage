@@ -1,4 +1,5 @@
 load("PMNS.sage")
+import pdb
 import random
 PolyRing = PolynomialRing(ZZ, x)
 
@@ -40,15 +41,29 @@ def AMNS_FIOS(A_arr, B_arr, E, M_arr, M_prime_0):
     
     for i in range(s):
         res_arr[0] = (res_arr[0] + (A_arr[i]*B_arr[0] % E)).map_coefficients(lambda t : t % 2**(48))
+        #breakpoint()
         q = (((res_arr[0].map_coefficients(lambda t : t % W))*M_prime_0) % E).map_coefficients(lambda t : t % W)
+        #breakpoint()
         res_arr[0] = (res_arr[0] + (q*M_arr[0] % E)).map_coefficients(lambda t : t % 2**(48))
+        #breakpoint()
         res_arr[0] = polsra(res_arr[0], 48, w)
+        #breakpoint()
         for j in range(1, s):
-            res_arr[j-1] = (res_arr[j-1] + (A_arr[i]*B_arr[j] % E) + (q*M_arr[j] % E) + res_arr[j]).map_coefficients(lambda t : t % 2**(48))
+            res_arr[j-1] = (res_arr[j-1] + res_arr[j])
+            #breakpoint()
+            res_arr[j-1] = (res_arr[j-1] + (A_arr[i]*B_arr[j] % E))
+            #breakpoint()
+            res_arr[j-1] = (res_arr[j-1] + (q*M_arr[j] % E))
+            #breakpoint()
+            res_arr[j-1] = res_arr[j-1].map_coefficients(lambda t : t % 2**(48))
+            #breakpoint()
             res_arr[j] = polsra(res_arr[j-1], 48, w)
+            #breakpoint()
             res_arr[j-1] = res_arr[j-1].map_coefficients(lambda t : t % W)
+            #breakpoint()
                     
     res_arr[s-1] = res_arr[s-1].map_coefficients(lambda t : t % (2**w))
+    #breakpoint()
     
     return res_arr
 

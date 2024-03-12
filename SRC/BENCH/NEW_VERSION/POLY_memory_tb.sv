@@ -30,10 +30,8 @@ module POLY_memory_tb #(
 
     reg load_RES_reg_en = 0;
 
-    reg [S-1:0] A_reg_coeff_rot = 0;
     reg B_reg_shift = 0;
     reg M_reg_shift = 0;
-    reg M_prime_0_reg_rot = 0;
 
     reg [N*WORD_WIDTH-1:0] RES_reg_din = 0;
 
@@ -43,7 +41,7 @@ module POLY_memory_tb #(
 
     wire [WORD_WIDTH-1:0] BRAM_din;
 
-    wire [S*WORD_WIDTH-1:0] A_reg_dout;
+    wire [N*S*WORD_WIDTH-1:0] A_reg_dout;
     wire [N*WORD_WIDTH-1:0] B_reg_dout;
     wire [WORD_WIDTH-1:0] M_reg_dout;
     wire [WORD_WIDTH-1:0] M_prime_0_reg_dout;
@@ -67,10 +65,8 @@ module POLY_memory_tb #(
 
     .load_RES_reg_en_i(load_RES_reg_en),
 
-    .A_reg_coeff_rot_i(A_reg_coeff_rot),
     .B_reg_shift_i(B_reg_shift),
     .M_reg_shift_i(M_reg_shift),
-    .M_prime_0_reg_rot_i(M_prime_0_reg_rot),
 
     .RES_reg_din_i(RES_reg_din),
 
@@ -160,6 +156,7 @@ module POLY_memory_tb #(
             $write("FAILURE ");
         $write("(test %0d/%0d) STORE INPUT data\n", test_count, NB_TESTS);
         #PERIOD;
+        // Display number of successful tests
         $write("(%0d/%0d) tests completed\n", successful_test_count, NB_TESTS);
         if (successful_test_count == NB_TESTS)
             $write("SUCCESS\n");

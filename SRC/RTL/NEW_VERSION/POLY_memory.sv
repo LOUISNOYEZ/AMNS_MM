@@ -17,10 +17,8 @@ module POLY_memory #(
 
     input  load_RES_reg_en_i,
 
-    input  [S-1:0] A_reg_coeff_rot_i,
     input  B_reg_shift_i,
     input  M_reg_shift_i,
-    input  M_prime_0_reg_rot_i,
 
     input  [N*WORD_WIDTH-1:0] RES_reg_din_i,
 
@@ -31,10 +29,10 @@ module POLY_memory #(
 
     output [WORD_WIDTH-1:0] BRAM_din_o,
 
-    output [S*WORD_WIDTH-1:0] A_reg_dout_o,
+    output [N*S*WORD_WIDTH-1:0] A_reg_dout_o,
     output [N*WORD_WIDTH-1:0] B_reg_dout_o,
-    output [WORD_WIDTH-1:0]   M_reg_dout_o,
-    output [WORD_WIDTH-1:0]   M_prime_0_reg_dout_o,
+    output [N*WORD_WIDTH-1:0]   M_reg_dout_o,
+    output [N*WORD_WIDTH-1:0]   M_prime_0_reg_dout_o,
     
     output load_done_o,
     output store_done_o
@@ -90,10 +88,8 @@ module POLY_memory #(
         .load_RES_reg_en_i(load_RES_reg_en_i),
         .store_RES_reg_en_i(store_RES_reg_en),
 
-        .A_reg_coeff_rot_i(A_reg_coeff_rot_i),
         .B_reg_shift_i(B_reg_shift_i),
         .M_reg_shift_i(M_reg_shift_i),
-        .M_prime_0_rot_i(M_prime_0_reg_rot_i),
 
         .INPUT_reg_din_i(BRAM_dout_reg),
         .RES_reg_din_i(RES_reg_din_i),

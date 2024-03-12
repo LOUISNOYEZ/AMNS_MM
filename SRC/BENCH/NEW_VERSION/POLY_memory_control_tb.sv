@@ -9,7 +9,7 @@ module POLY_memory_control_tb #(
 
     localparam realtime PERIOD = 10,
                         HALF_PERIOD = PERIOD/2;
-    
+
     localparam NB_TESTS = 9;
     reg [$clog2(NB_TESTS):0] test_count = 0;
     reg [$clog2(NB_TESTS):0] successful_test_count = 0;
