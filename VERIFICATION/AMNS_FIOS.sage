@@ -29,54 +29,38 @@ def polsra(A, init_width, shift_width):
         A = A.lift()
     return A.map_coefficients(lambda t : sra(t, init_width, shift_width))
     
-def AMNS_FIOS(A_arr, B_arr, E, M_arr, M_prime_0):
+def AMNS_FIOS(A_arr, B_arr, E, M_arr, M_prime_0, acc_width = 48, w = 17):
 
-    w = 17
-    
-    W = 2**17
+    W = 2**w
 
     s = len(A_arr)
     
     res_arr = s*[PolyRing(0)]
-    
+
     for i in range(s):
-        res_arr[0] = (res_arr[0] + (A_arr[i]*B_arr[0] % E)).map_coefficients(lambda t : t % 2**(48))
-        #breakpoint()
+        res_arr[0] = (res_arr[0] + (A_arr[i]*B_arr[0] % E)).map_coefficients(lambda t : t % 2**(acc_width) if i == s-1 else t)
         q = (((res_arr[0].map_coefficients(lambda t : t % W))*M_prime_0) % E).map_coefficients(lambda t : t % W)
-        #breakpoint()
-        res_arr[0] = (res_arr[0] + (q*M_arr[0] % E)).map_coefficients(lambda t : t % 2**(48))
-        #breakpoint()
-        res_arr[0] = polsra(res_arr[0], 48, w)
-        #breakpoint()
+        res_arr[0] = (res_arr[0] + (q*M_arr[0] % E)).map_coefficients(lambda t : t % 2**acc_width)
+        res_arr[0] = polsra(res_arr[0], acc_width, w)
         for j in range(1, s):
             res_arr[j-1] = (res_arr[j-1] + res_arr[j])
-            #breakpoint()
             res_arr[j-1] = (res_arr[j-1] + (A_arr[i]*B_arr[j] % E))
-            #breakpoint()
             res_arr[j-1] = (res_arr[j-1] + (q*M_arr[j] % E))
-            #breakpoint()
-            res_arr[j-1] = res_arr[j-1].map_coefficients(lambda t : t % 2**(48))
-            #breakpoint()
-            res_arr[j] = polsra(res_arr[j-1], 48, w)
-            #breakpoint()
+            res_arr[j-1] = res_arr[j-1].map_coefficients(lambda t : t % 2**(acc_width) if (i == s-1) or (j == s-1) else t)
+            res_arr[j] = polsra(res_arr[j-1], acc_width, w)
             res_arr[j-1] = res_arr[j-1].map_coefficients(lambda t : t % W)
-            #breakpoint()
-                    
-    res_arr[s-1] = res_arr[s-1].map_coefficients(lambda t : t % (2**w))
-    #breakpoint()
     
     return res_arr
 
-#if __name__=="__main__":
-def test(p_size):
+def test(p_size, N = 5, LAMBDA = 2, acc_width = 48, w = 17):
+
     PolyRing = PolynomialRing(ZZ, name = "x", sparse = False)
 
     p = random_prime(2**p_size-1, False, 2**(p_size-1))
 
-    w = 17
     W = 2**w
 
-    E = PolyRing("x**11-2")
+    E = PolyRing(f"x**{N}-{LAMBDA}")
 
     PMNS_inst = PMNS(p, E, phi_word_width=w)
 
@@ -98,17 +82,17 @@ def test(p_size):
     A = PMNS_inst(a, mgt=False)
     B = PMNS_inst(b, mgt=False)
 
-    A_comp2 = polcomp2(A, (s-1)*w+48)
-    B_comp2 = polcomp2(B, (s-1)*w+48)
-    M_comp2 = polcomp2(M, (s-1)*w+48)
+    A_comp2 = polcomp2(A, (s-1)*w+acc_width)
+    B_comp2 = polcomp2(B, (s-1)*w+acc_width)
+    M_comp2 = polcomp2(M, (s-1)*w+acc_width)
 
     A_comp2_arr = [A_comp2.map_coefficients(lambda t : (t >> (i*w)) % W) for i in range(s-1)]
-    A_comp2_arr.append(A_comp2.map_coefficients(lambda t : (t >> ((s-1)*w)) % (2**48)))
+    A_comp2_arr.append(A_comp2.map_coefficients(lambda t : (t >> ((s-1)*w)) % (2**acc_width)))
     B_comp2_arr = [B_comp2.map_coefficients(lambda t : (t >> (i*w)) % W) for i in range(s-1)]
-    B_comp2_arr.append(B_comp2.map_coefficients(lambda t : (t >> ((s-1)*w)) % (2**48)))
+    B_comp2_arr.append(B_comp2.map_coefficients(lambda t : (t >> ((s-1)*w)) % (2**acc_width)))
     M_comp2_arr = [M_comp2.map_coefficients(lambda t : (t >> (i*w)) % W) for i in range(s-1)]
-    M_comp2_arr.append(M_comp2.map_coefficients(lambda t : (t >> ((s-1)*w)) % (2**48)))
-    res_arr = AMNS_FIOS(A_comp2_arr, B_comp2_arr, E, M_comp2_arr, M_prime_0)
+    M_comp2_arr.append(M_comp2.map_coefficients(lambda t : (t >> ((s-1)*w)) % (2**acc_width)))
+    res_arr = AMNS_FIOS(A_comp2_arr, B_comp2_arr, E, M_comp2_arr, M_prime_0, acc_width = acc_width)
 
     res_temp = PolyRing(0)
     for i in range(s):
@@ -116,7 +100,7 @@ def test(p_size):
 
     print(res_temp)
         
-    res = poldecomp2(res_temp, s*w)
+    res = poldecomp2(res_temp, (s-1)*w+acc_width)
     
     verif = (a*b*inverse_mod(phi, p)) % p
     
